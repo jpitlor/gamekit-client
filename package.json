@@ -27,12 +27,15 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
+    "@dicebear/avatars": "^4.6.9",
+    "@dicebear/avatars-human-sprites": "^4.6.9",
     "@stomp/stompjs": "^6.1.0",
     "@types/sockjs-client": "^1.5.1",
     "@types/uuid": "^8.3.1",
     "commander": "^8.0.0",
     "cross-spawn": "^7.0.3",
     "sockjs-client": "^1.5.1",
+    "unique-names-generator": "^4.6.0",
     "uuid": "^8.3.2"
   }
 }

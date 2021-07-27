@@ -1,0 +1,24 @@
+# GameKit Client
+
+This is a companion package to the Maven `GameKit`. Together,
+they are meant to take the hard work out of game infrastructure, so
+you can focus on the business logic.
+
+## Connecting to a Server
+
+The main content of this package allows you to interact with a GameKit server.
+
+## Making a profile
+
+This package has a few utilities for generating names/images for
+profiles. They are convenient for when you want as little user input
+to validate as possible.
+
+## Installing
+
+`npm install @piticent123/gamekit`
+
+## TypeScript
+
+This package was developed using TypeScript and comes with 
+type definitions. You do not need to install anything extra.
