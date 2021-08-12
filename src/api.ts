@@ -2,12 +2,9 @@ import * as SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { v4 as uuidv4 } from "uuid";
 import { safeDispatch, sleep } from "./utils";
+import { Profile } from "./types";
 
-interface Profile {
-  id: string;
-  avatar: string;
-  name: string;
-}
+let client: Client;
 
 interface ServerOptions<T> {
   profile: Profile;
@@ -18,21 +15,6 @@ interface ServerOptions<T> {
   onSuccess: (message: string) => object;
   onGameUpdate: (game: T) => object;
 }
-
-interface Event {
-  route: string;
-  data: object;
-}
-
-interface JoinGameOptions<T> {
-  gameCode: string;
-  profile: Profile;
-  store: { dispatch: (action: object) => void };
-  onGameUpdate: (game: T) => object;
-}
-
-let client: Client;
-
 export function connectToServer<T>(options: ServerOptions<T>) {
   const {
     profile,
@@ -58,7 +40,7 @@ export function connectToServer<T>(options: ServerOptions<T>) {
 
   client = new Client({
     webSocketFactory: () => new SockJS(`${location.origin}/websocket-server`),
-    connectHeaders: { uuid: uuidv4() },
+    connectHeaders: { uuid: profile?.id ?? uuidv4() },
     onConnect: () => {
       client.subscribe("/topic/rejoin-game", async ({ body }) => {
         await joinGame({ gameCode: body, onGameUpdate, store, profile });
@@ -85,6 +67,12 @@ export function connectToServer<T>(options: ServerOptions<T>) {
   client.activate();
 }
 
+interface JoinGameOptions<T> {
+  gameCode: string;
+  profile: Profile;
+  store: { dispatch: (action: object) => void };
+  onGameUpdate: (game: T) => object;
+}
 export async function joinGame<T>(options: JoinGameOptions<T>) {
   const { profile, gameCode, store, onGameUpdate } = options;
 
@@ -107,11 +95,19 @@ export async function joinGame<T>(options: JoinGameOptions<T>) {
   });
 }
 
+interface Event {
+  route: string;
+  data: object;
+}
 export function sendEvent(event: Event) {
   const { route, data } = event;
 
   if (!client) {
     throw new Error("There is no active connection to the server");
+  }
+
+  if (!route.startsWith("/")) {
+    throw new Error("The route must contain a leading `/`");
   }
 
   client.publish({ destination: `/app${route}`, body: JSON.stringify(data) });

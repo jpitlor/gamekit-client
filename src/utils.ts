@@ -1,5 +1,4 @@
-export type Store = { dispatch: (action: object) => void };
-export type Action<T> = (parameter: T) => object;
+import { Action, Store } from "./types";
 
 export async function sleep(ms: number) {
   await new Promise((resolve) => setTimeout(resolve, ms));
