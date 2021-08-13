@@ -1,6 +1,6 @@
 {
   "name": "@piticent123/gamekit-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A client for game infrastructure",
   "main": "src/index.ts",
   "bin": "bin/gamekit.js",
