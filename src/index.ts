@@ -1,2 +1,2 @@
-export * as api from "./api";
-export * as profile from "./profile";
+export * from "./api";
+export * from "./profile";

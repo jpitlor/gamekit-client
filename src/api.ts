@@ -67,6 +67,10 @@ export function connectToServer<T>(options: ServerOptions<T>) {
   client.activate();
 }
 
+export function createGame(gameCode: string) {
+  client.publish({ destination: `/app/games/${gameCode}/create` });
+}
+
 interface JoinGameOptions<T> {
   gameCode: string;
   profile: Profile;
@@ -118,4 +122,8 @@ export function updateProfile(gameCode: string, profile: Profile) {
     destination: `/app/games/${gameCode}/update`,
     body: JSON.stringify(profile),
   });
+}
+
+export function becomeAdmin(gameCode: string) {
+  client.publish({ destination: `/app/games/${gameCode}/become-admin` });
 }

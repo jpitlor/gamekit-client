@@ -11,7 +11,7 @@ program
   .command("start")
   .description("starts a development server")
   .option("-p, --port <port_number>", "1234")
-  .action((options: any) => {});
+  .action((options) => {});
 
 program
   .command("build")
