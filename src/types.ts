@@ -4,5 +4,5 @@ export interface Profile {
   name: string;
 }
 
-export type Store = { dispatch: (action: object) => void };
+export type Dispatch = (action: object) => void;
 export type Action<T> = (parameter: T) => object;

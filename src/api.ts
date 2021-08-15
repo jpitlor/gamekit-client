@@ -2,13 +2,13 @@ import * as SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { v4 as uuidv4 } from "uuid";
 import { safeDispatch, sleep } from "./utils";
-import { Profile } from "./types";
+import { Dispatch, Profile } from "./types";
 
 let client: Client;
 
 interface ServerOptions<T> {
   profile: Profile;
-  store: { dispatch: (action: object) => void };
+  dispatch: Dispatch;
   onGamesList: (games: string[]) => object;
   onClientError?: (error: string) => object;
   onServerError?: (error: string) => object;
@@ -18,7 +18,7 @@ interface ServerOptions<T> {
 export function connectToServer<T>(options: ServerOptions<T>) {
   const {
     profile,
-    store,
+    dispatch,
     onGamesList,
     onServerError,
     onClientError,
@@ -47,23 +47,23 @@ export function connectToServer<T>(options: ServerOptions<T>) {
     connectHeaders: { uuid: profile?.id ?? uuidv4() },
     onConnect: () => {
       client.subscribe("/topic/rejoin-game", async ({ body }) => {
-        await joinGame({ gameCode: body, onGameUpdate, store, profile });
+        await joinGame({ gameCode: body, onGameUpdate, dispatch, profile });
       });
 
       client.subscribe("/topic/games", ({ body }) => {
-        safeDispatch(store, onGamesList, JSON.parse(body) as string[]);
+        safeDispatch(dispatch, onGamesList, JSON.parse(body) as string[]);
       });
 
       client.subscribe(`/user/topic/errors/client`, ({ body }) => {
-        safeDispatch(store, onClientError, body);
+        safeDispatch(dispatch, onClientError, body);
       });
 
       client.subscribe(`/user/topic/errors/server`, ({ body }) => {
-        safeDispatch(store, onServerError, body);
+        safeDispatch(dispatch, onServerError, body);
       });
 
       client.subscribe(`/user/topic/successes`, ({ body }) => {
-        safeDispatch(store, onSuccess, body);
+        safeDispatch(dispatch, onSuccess, body);
       });
     },
   });
@@ -78,11 +78,11 @@ export function createGame(gameCode: string) {
 interface JoinGameOptions<T> {
   gameCode: string;
   profile: Profile;
-  store: { dispatch: (action: object) => void };
+  dispatch: Dispatch;
   onGameUpdate: (game: T) => object;
 }
 export async function joinGame<T>(options: JoinGameOptions<T>) {
-  const { profile, gameCode, store, onGameUpdate } = options;
+  const { profile, gameCode, dispatch, onGameUpdate } = options;
 
   if (!client) {
     throw new Error("There is no active connection to the server");
@@ -99,7 +99,7 @@ export async function joinGame<T>(options: JoinGameOptions<T>) {
 
   client.subscribe(`/topic/games/${gameCode}`, ({ body }) => {
     const response = JSON.parse(body) as T;
-    store.dispatch(onGameUpdate(response));
+    safeDispatch(dispatch, onGameUpdate, response);
   });
 }
 
