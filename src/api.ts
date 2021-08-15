@@ -10,9 +10,9 @@ interface ServerOptions<T> {
   profile: Profile;
   store: { dispatch: (action: object) => void };
   onGamesList: (games: string[]) => object;
-  onClientError: (error: string) => object;
-  onServerError: (error: string) => object;
-  onSuccess: (message: string) => object;
+  onClientError?: (error: string) => object;
+  onServerError?: (error: string) => object;
+  onSuccess?: (message: string) => object;
   onGameUpdate: (game: T) => object;
 }
 export function connectToServer<T>(options: ServerOptions<T>) {
@@ -36,6 +36,10 @@ export function connectToServer<T>(options: ServerOptions<T>) {
 
   if (!onGamesList) {
     throw new Error("onGamesList is undefined, but it is required");
+  }
+
+  if (!onGameUpdate) {
+    throw new Error("onGameUpdate is undefined, but it is required");
   }
 
   client = new Client({
@@ -101,7 +105,7 @@ export async function joinGame<T>(options: JoinGameOptions<T>) {
 
 interface Event {
   route: string;
-  data: object;
+  data?: object;
 }
 export function sendEvent(event: Event) {
   const { route, data } = event;
