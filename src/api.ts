@@ -2,12 +2,12 @@ import * as SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { v4 as uuidv4 } from "uuid";
 import { safeDispatch, sleep } from "./utils";
-import { Dispatch, Profile } from "./types";
+import { Dispatch, Settings } from "./types";
 
 let client: Client;
 
 interface ServerOptions<T> {
-  profile: Profile;
+  profile: Settings;
   dispatch: Dispatch;
   onGamesList: (games: string[]) => object;
   onClientError?: (error: string) => object;
@@ -77,7 +77,7 @@ export function createGame(gameCode: string) {
 
 interface JoinGameOptions<T> {
   gameCode: string;
-  profile: Profile;
+  profile: Settings;
   dispatch: Dispatch;
   onGameUpdate: (game: T) => object;
 }
@@ -121,7 +121,7 @@ export function sendEvent(event: Event) {
   client.publish({ destination: `/app${route}`, body: JSON.stringify(data) });
 }
 
-export function updateProfile(gameCode: string, profile: Profile) {
+export function updateProfile(gameCode: string, profile: Settings) {
   client.publish({
     destination: `/app/games/${gameCode}/update`,
     body: JSON.stringify(profile),
