@@ -6,6 +6,17 @@ import { Dispatch, Settings } from "./types";
 
 let client: Client;
 
+function getOrSetId(): string {
+  let key = "dev.pitlor.gamekit-client__id";
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = uuidv4();
+    localStorage.setItem(key, id);
+  }
+
+  return id;
+}
+
 interface ServerOptions<T> {
   profile: Settings;
   dispatch: Dispatch;
@@ -42,9 +53,15 @@ export function connectToServer<T>(options: ServerOptions<T>) {
     throw new Error("onGameUpdate is undefined, but it is required");
   }
 
+  let uuid = profile.id;
+  if (!uuid) {
+    uuid = getOrSetId();
+    profile.id = uuid;
+  }
+
   client = new Client({
     webSocketFactory: () => new SockJS(`${location.origin}/websocket-server`),
-    connectHeaders: { uuid: profile?.id ?? uuidv4() },
+    connectHeaders: { uuid },
     onConnect: () => {
       client.subscribe("/topic/rejoin-game", async ({ body }) => {
         await joinGame({ gameCode: body, onGameUpdate, dispatch, profile });
