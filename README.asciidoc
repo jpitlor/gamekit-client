@@ -1,10 +1,13 @@
+:toc:
+:toc-placement!:
+
 = GameKit Client
 
 This is a companion package to the Maven `GameKit`. Together,
 they are meant to take the hard work out of game infrastructure, so
 you can focus on the business logic.
 
-:toc:
+toc::[]
 
 == Common Use Cases
 
