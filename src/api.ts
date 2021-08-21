@@ -122,7 +122,7 @@ export async function joinGame<T>(options: JoinGameOptions<T>) {
 
 interface Event {
   route: string;
-  data?: object;
+  data?: any;
 }
 export function sendEvent(event: Event) {
   const { route, data } = event;
