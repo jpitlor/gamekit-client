@@ -158,3 +158,4 @@ export const actions = {
   rejoinGame,
   becomeAdmin,
 };
+export { reducer };
