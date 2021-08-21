@@ -102,8 +102,9 @@ const { actions: syncActions, reducer } = createSlice({
     },
     currentGame: {
       code: "",
-      active: false,
-      admin: "",
+      isActive: false,
+      adminId: "",
+      players: [],
     },
     openGames: [],
   } as State,
