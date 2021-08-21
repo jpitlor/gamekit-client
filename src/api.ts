@@ -1,13 +1,13 @@
 import * as SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import { v4 as uuidv4 } from "uuid";
-import { safeDispatch, sleep } from "./utils";
+import { namespaced, safeDispatch, sleep } from "./utils";
 import { Dispatch, Settings } from "./types";
 
 let client: Client;
 
 function getOrSetId(): string {
-  let key = "dev.pitlor.gamekit-client__id";
+  let key = namespaced`id`;
   let id = localStorage.getItem(key);
   if (!id) {
     id = uuidv4();

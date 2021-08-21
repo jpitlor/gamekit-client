@@ -2,12 +2,13 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import * as api from "./api";
 import { Game, Settings, State } from "./types";
+import { namespaced } from "./utils";
 
 interface ThunkApi {
   state: State;
 }
 
-const connectToServer = createAsyncThunk<void, void, ThunkApi>(
+export const connectToServer = createAsyncThunk<void, void, ThunkApi>(
   "connectToServer",
   (_, { getState, dispatch }) => {
     const { settings } = getState();
@@ -35,13 +36,20 @@ export const saveSettings = createAsyncThunk<
 
   api.updateProfile(code, { ...oldSettings, ...settings });
   Object.entries(settings).forEach(([k, v]) => {
-    localStorage.setItem(k, v.toString());
+    localStorage.setItem(k, namespaced`${v.toString()}`);
   });
 
   return settings;
 });
 
-const joinGame = createAsyncThunk<void, string, ThunkApi>(
+export const createGame = createAsyncThunk<void, string>(
+  "createGame",
+  async (code) => {
+    await api.createGame(code);
+  }
+);
+
+export const joinGame = createAsyncThunk<void, string, ThunkApi>(
   "joinGame",
   async (gameCode, { getState, dispatch }) => {
     const { settings } = getState();
@@ -54,7 +62,7 @@ const joinGame = createAsyncThunk<void, string, ThunkApi>(
   }
 );
 
-const rejoinGame = createAsyncThunk<void, string, ThunkApi>(
+export const rejoinGame = createAsyncThunk<void, string, ThunkApi>(
   "rejoinGame",
   async (gameCode, { dispatch, getState }) => {
     if (!gameCode) return;
@@ -69,7 +77,7 @@ const rejoinGame = createAsyncThunk<void, string, ThunkApi>(
   }
 );
 
-const becomeAdmin = createAsyncThunk<void, void, ThunkApi>(
+export const becomeAdmin = createAsyncThunk<void, void, ThunkApi>(
   "becomeAdmin",
   (_, { getState }) => {
     const { currentGame } = getState();
@@ -79,7 +87,26 @@ const becomeAdmin = createAsyncThunk<void, void, ThunkApi>(
 
 const { actions, reducer } = createSlice({
   name: "gamekit",
-  initialState: {} as State,
+  initialState: {
+    message: {
+      id: "",
+      title: "",
+      description: "",
+      status: "info",
+    },
+    settings: {
+      id: localStorage.getItem(namespaced`id`),
+      avatar: localStorage.getItem(namespaced`avatar`),
+      name: localStorage.getItem(namespaced`name`),
+      connected: false,
+    },
+    currentGame: {
+      code: "",
+      active: false,
+      admin: "",
+    },
+    openGames: [],
+  } as State,
   reducers: {
     handleRequestException: (state, action: PayloadAction<string>) => {
       state.message = {

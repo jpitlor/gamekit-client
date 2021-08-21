@@ -15,3 +15,10 @@ export function safeDispatch<T>(
 
   dispatch(action(parameter));
 }
+
+export function namespaced(
+  strings: TemplateStringsArray,
+  ...args: string[]
+): string {
+  return "dev.pitlor.gamekit-client__" + (args[0] ?? strings[0]);
+}
