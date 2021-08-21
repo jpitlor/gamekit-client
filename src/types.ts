@@ -8,16 +8,22 @@ export interface Settings {
 export type Dispatch = (action: object) => void;
 export type Action<T> = (parameter: T) => object;
 
-export interface Game {
-  code: string;
-  active: boolean;
-  admin: string;
-  // players: Player[];
+export interface Player<S extends object = {}> {
+  id: string;
+  settings: Settings & S;
+  startOfTimeOffline?: Date;
 }
 
-export interface State {
+export interface Game<P extends Player = Player> {
+  code: string;
+  isActive: boolean;
+  adminId: string;
+  players: P[];
+}
+
+export interface State<T extends Game = Game> {
   openGames: string[];
-  currentGame: Game;
+  currentGame: T;
   settings: Settings;
   message: {
     id: string;
