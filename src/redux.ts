@@ -8,7 +8,7 @@ interface ThunkApi {
   state: State;
 }
 
-export const connectToServer = createAsyncThunk<void, void, ThunkApi>(
+const connectToServer = createAsyncThunk<void, void, ThunkApi>(
   "connectToServer",
   (_, { getState, dispatch }) => {
     const { settings } = getState();
@@ -24,7 +24,7 @@ export const connectToServer = createAsyncThunk<void, void, ThunkApi>(
   }
 );
 
-export const saveSettings = createAsyncThunk<
+const saveSettings = createAsyncThunk<
   Partial<Settings>,
   Partial<Settings>,
   ThunkApi
@@ -42,14 +42,14 @@ export const saveSettings = createAsyncThunk<
   return settings;
 });
 
-export const createGame = createAsyncThunk<void, string>(
+const createGame = createAsyncThunk<void, string>(
   "createGame",
   async (code) => {
     await api.createGame(code);
   }
 );
 
-export const joinGame = createAsyncThunk<void, string, ThunkApi>(
+const joinGame = createAsyncThunk<void, string, ThunkApi>(
   "joinGame",
   async (gameCode, { getState, dispatch }) => {
     const { settings } = getState();
@@ -62,7 +62,7 @@ export const joinGame = createAsyncThunk<void, string, ThunkApi>(
   }
 );
 
-export const rejoinGame = createAsyncThunk<void, string, ThunkApi>(
+const rejoinGame = createAsyncThunk<void, string, ThunkApi>(
   "rejoinGame",
   async (gameCode, { dispatch, getState }) => {
     if (!gameCode) return;
@@ -77,7 +77,7 @@ export const rejoinGame = createAsyncThunk<void, string, ThunkApi>(
   }
 );
 
-export const becomeAdmin = createAsyncThunk<void, void, ThunkApi>(
+const becomeAdmin = createAsyncThunk<void, void, ThunkApi>(
   "becomeAdmin",
   (_, { getState }) => {
     const { currentGame } = getState();
@@ -85,7 +85,7 @@ export const becomeAdmin = createAsyncThunk<void, void, ThunkApi>(
   }
 );
 
-const { actions, reducer } = createSlice({
+const { actions: syncActions, reducer } = createSlice({
   name: "gamekit",
   initialState: {
     message: {
@@ -149,4 +149,12 @@ const { actions, reducer } = createSlice({
   },
 });
 
-export { actions, reducer };
+export const actions = {
+  ...syncActions,
+  connectToServer,
+  saveSettings,
+  createGame,
+  joinGame,
+  rejoinGame,
+  becomeAdmin,
+};
