@@ -21,9 +21,9 @@ export interface Game<P extends Player = Player> {
   players: P[];
 }
 
-export interface State<T extends Game = Game> {
+export interface State<G extends Game = Game> {
   openGames: string[];
-  currentGame: T;
+  currentGame: G;
   settings: Settings;
   message: {
     id: string;
