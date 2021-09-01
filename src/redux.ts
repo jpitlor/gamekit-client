@@ -1,27 +1,66 @@
 import {
+  AsyncThunk,
   createAsyncThunk,
   createSlice,
-  Draft,
   PayloadAction,
+  Reducer,
 } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
 import * as api from "./api";
-import { Game, Player, Settings, State } from "./types";
+import { Game, Player, Settings, State, ThunkApi } from "./types";
 import { namespaced } from "./utils";
 
-interface ThunkApi<G extends Game> {
-  state: State<G>;
-}
-
-export function createGamekitSlice<
-  S extends object = {},
+interface CreateGameSlice<
+  S extends Settings = Settings,
   P extends Player<S> = Player<S>,
   G extends Game<P> = Game<P>
->() {
-  const connectToServer = createAsyncThunk<void, void, ThunkApi<G>>(
+> {
+  actions: {
+    handleRequestException: (message: string) => void;
+    handleServerException: (message: string) => void;
+    handleSuccess: (message: string) => void;
+    handleGamesListMessage: (message: string[]) => void;
+    handleGameUpdate: (message: G) => void;
+    connectToServer: AsyncThunk<void, void, ThunkApi<G>>;
+    saveSettings: AsyncThunk<Partial<S>, Partial<S>, ThunkApi<G>>;
+    createGame: AsyncThunk<void, string, ThunkApi<G>>;
+    joinGame: AsyncThunk<void, string, ThunkApi<G>>;
+    rejoinGame: AsyncThunk<void, string, ThunkApi<G>>;
+    becomeAdmin: AsyncThunk<void, void, ThunkApi<G>>;
+  };
+  createThunk: <I = void, O = void>(
+    typePrefix: string,
+    payloadCreator: (payload: {
+      state: State<G>;
+      dispatch: any;
+      parameter: I;
+    }) => O
+  ) => AsyncThunk<O, I, ThunkApi<G>>;
+  reducer: Reducer<State<G>>;
+}
+export function createGamekitSlice<
+  S extends Settings = Settings,
+  P extends Player<S> = Player<S>,
+  G extends Game<P> = Game<P>
+>(): CreateGameSlice<S, P, G> {
+  function createThunk<P = void, R = void>(
+    typePrefix: string,
+    payloadCreator: (payload: {
+      state: State<G>;
+      dispatch: any;
+      parameter: P;
+    }) => R
+  ): AsyncThunk<R, P, ThunkApi<G>> {
+    return createAsyncThunk<R, P, ThunkApi<G>>(
+      typePrefix,
+      (parameter, { getState, dispatch }) =>
+        payloadCreator({ parameter, dispatch, state: getState() })
+    );
+  }
+
+  const connectToServer = createThunk(
     "connectToServer",
-    (_, { getState, dispatch }) => {
-      const { settings } = getState();
+    ({ state: { settings }, dispatch }) => {
       api.connectToServer({
         profile: settings,
         dispatch,
@@ -34,35 +73,31 @@ export function createGamekitSlice<
     }
   );
 
-  const saveSettings = createAsyncThunk<
-    Partial<Settings>,
-    Partial<Settings>,
-    ThunkApi<G>
-  >("saveSettings", (settings, { getState }) => {
-    const {
-      currentGame: { code },
-      settings: oldSettings,
-    } = getState();
+  const saveSettings = createThunk<Partial<S>, Partial<S>>(
+    "saveSettings",
+    ({
+      parameter: settings,
+      state: { settings: oldSettings, currentGame },
+    }) => {
+      api.updateProfile(currentGame.code, { ...oldSettings, ...settings });
+      Object.entries(settings).forEach(([k, v]) => {
+        localStorage.setItem(k, namespaced`${v.toString()}`);
+      });
 
-    api.updateProfile(code, { ...oldSettings, ...settings });
-    Object.entries(settings).forEach(([k, v]) => {
-      localStorage.setItem(k, namespaced`${v.toString()}`);
-    });
+      return settings;
+    }
+  );
 
-    return settings;
-  });
-
-  const createGame = createAsyncThunk<void, string>(
+  const createGame = createThunk<string>(
     "createGame",
-    async (code) => {
+    async ({ parameter: code }) => {
       await api.createGame(code);
     }
   );
 
-  const joinGame = createAsyncThunk<void, string, ThunkApi<G>>(
+  const joinGame = createThunk<string>(
     "joinGame",
-    async (gameCode, { getState, dispatch }) => {
-      const { settings } = getState();
+    async ({ parameter: gameCode, state: { settings }, dispatch }) => {
       await api.joinGame({
         gameCode,
         dispatch,
@@ -72,12 +107,11 @@ export function createGamekitSlice<
     }
   );
 
-  const rejoinGame = createAsyncThunk<void, string, ThunkApi<G>>(
+  const rejoinGame = createThunk<string>(
     "rejoinGame",
-    async (gameCode, { dispatch, getState }) => {
+    async ({ parameter: gameCode, state: { settings }, dispatch }) => {
       if (!gameCode) return;
 
-      const { settings } = getState();
       await api.joinGame({
         gameCode,
         dispatch,
@@ -87,10 +121,9 @@ export function createGamekitSlice<
     }
   );
 
-  const becomeAdmin = createAsyncThunk<void, void, ThunkApi<G>>(
+  const becomeAdmin = createThunk(
     "becomeAdmin",
-    (_, { getState }) => {
-      const { currentGame } = getState();
+    ({ state: { currentGame } }) => {
       api.becomeAdmin(currentGame.code);
     }
   );
@@ -171,6 +204,7 @@ export function createGamekitSlice<
       rejoinGame,
       becomeAdmin,
     },
+    createThunk,
     reducer,
   };
 }

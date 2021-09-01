@@ -1,13 +1,8 @@
-:toc:
-:toc-placement!:
-
-= GameKit Client
+f= GameKit Client
 
 This is a companion package to the Maven `GameKit`. Together,
 they are meant to take the hard work out of game infrastructure, so
 you can focus on the business logic.
-
-toc::[]
 
 == Common Use Cases
 
@@ -25,17 +20,7 @@ to validate as possible.
 
 `npm install @piticent123/gamekit`
 
-== TypeScript
+=== TypeScript
 
 This package was developed using TypeScript and comes with
 type definitions. You do not need to install anything extra.
-
-== API
-
-=== Socket API
-
-=== React Hooks
-
-=== Profile Utilities
-
-=== Redux Helpers

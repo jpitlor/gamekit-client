@@ -8,9 +8,9 @@ export interface Settings {
 export type Dispatch = (action: object) => void;
 export type Action<T> = (parameter: T) => object;
 
-export interface Player<S extends object = {}> {
+export interface Player<S extends Settings = Settings> {
   id: string;
-  settings: Settings & S;
+  settings: S;
   startOfTimeOffline?: Date;
 }
 
@@ -31,4 +31,8 @@ export interface State<G extends Game = Game> {
     description: string;
     status: "info" | "warning" | "success" | "error";
   };
+}
+
+export interface ThunkApi<G extends Game> {
+  state: State<G>;
 }

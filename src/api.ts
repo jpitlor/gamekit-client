@@ -138,7 +138,10 @@ export function sendEvent(event: Event) {
   client.publish({ destination: `/app${route}`, body: JSON.stringify(data) });
 }
 
-export function updateProfile(gameCode: string, profile: Settings) {
+export function updateProfile<S extends Settings>(
+  gameCode: string,
+  profile: S
+) {
   client.publish({
     destination: `/app/games/${gameCode}/update`,
     body: JSON.stringify(profile),
