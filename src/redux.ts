@@ -61,7 +61,7 @@ export function createGamekitSlice<
   const connectToServer = createThunk(
     "connectToServer",
     ({ state: { settings }, dispatch }) => {
-      api.connectToServer({
+      const id = api.connectToServer({
         profile: settings,
         dispatch,
         onGamesList: actions.handleGamesListMessage,
@@ -70,6 +70,8 @@ export function createGamekitSlice<
         onServerError: actions.handleServerException,
         onSuccess: actions.handleSuccess,
       });
+
+      dispatch(saveSettings({ id } as Partial<S>));
     }
   );
 

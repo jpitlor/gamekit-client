@@ -26,7 +26,7 @@ interface ServerOptions<T> {
   onSuccess?: (message: string) => object;
   onGameUpdate: (game: T) => object;
 }
-export function connectToServer<T>(options: ServerOptions<T>) {
+export function connectToServer<T>(options: ServerOptions<T>): string {
   const {
     profile,
     dispatch,
@@ -53,12 +53,7 @@ export function connectToServer<T>(options: ServerOptions<T>) {
     throw new Error("onGameUpdate is undefined, but it is required");
   }
 
-  let uuid = profile.id;
-  if (!uuid) {
-    uuid = getOrSetId();
-    profile.id = uuid;
-  }
-
+  const uuid = profile.id || getOrSetId();
   client = new Client({
     webSocketFactory: () => new SockJS(`${location.origin}/websocket-server`),
     connectHeaders: { uuid },
@@ -86,6 +81,7 @@ export function connectToServer<T>(options: ServerOptions<T>) {
   });
 
   client.activate();
+  return uuid;
 }
 
 export function createGame(gameCode: string) {
