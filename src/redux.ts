@@ -187,12 +187,31 @@ export function createGamekitSlice<
       },
     },
     extraReducers: (builder) => {
-      builder.addCase(saveSettings.fulfilled, (state, action) => {
-        state.settings = {
-          ...state.settings,
-          ...action.payload,
-        };
-      });
+      builder
+        .addCase(saveSettings.fulfilled, (state, action) => {
+          state.settings = {
+            ...state.settings,
+            ...action.payload,
+          };
+        })
+        .addCase(connectToServer.rejected, (state, action) => {
+          console.error(action.error)
+        })
+        .addCase(saveSettings.rejected, (state, action) => {
+          console.error(action.error)
+        })
+        .addCase(createGame.rejected, (state, action) => {
+          console.error(action.error)
+        })
+        .addCase(joinGame.rejected, (state, action) => {
+          console.error(action.error)
+        })
+        .addCase(rejoinGame.rejected, (state, action) => {
+          console.error(action.error)
+        })
+        .addCase(becomeAdmin.rejected, (state, action) => {
+          console.error(action.error)
+        });
     },
   });
 
