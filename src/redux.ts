@@ -54,7 +54,7 @@ export function createGamekitSlice<
     return createAsyncThunk<R, P, ThunkApi<G>>(
       typePrefix,
       (parameter, { getState, dispatch }) =>
-        payloadCreator({ parameter, dispatch, state: getState() })
+        payloadCreator({ parameter, dispatch, state: getState().gamekit })
     );
   }
 

@@ -34,5 +34,7 @@ export interface State<G extends Game = Game> {
 }
 
 export interface ThunkApi<G extends Game> {
-  state: State<G>;
+  state: {
+    gamekit: State<G>
+  };
 }
