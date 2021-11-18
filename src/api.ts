@@ -138,6 +138,11 @@ export function updateProfile<S extends Settings>(
   gameCode: string,
   profile: S
 ) {
+  if (!client) {
+    // This is normal - this method gets called when creating a profile as well, before we connect to the server
+    return;
+  }
+
   client.publish({
     destination: `/app/games/${gameCode}/update`,
     body: JSON.stringify(profile),
