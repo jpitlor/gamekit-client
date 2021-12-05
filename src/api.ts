@@ -116,11 +116,11 @@ export async function joinGame<T>(options: JoinGameOptions<T>) {
   });
 }
 
-interface Event {
+interface SendEvent {
   route: string;
   data?: any;
 }
-export function sendEvent(event: Event) {
+export function sendEvent(event: SendEvent) {
   const { route, data } = event;
 
   if (!client) {
@@ -134,11 +134,11 @@ export function sendEvent(event: Event) {
   client.publish({ destination: `/app${route}`, body: JSON.stringify(data) });
 }
 
-interface Event {
+interface Subscribe {
   route: string;
   callback: messageCallbackType;
 }
-export function subscribe(event: Event) {
+export function subscribe(event: Subscribe) {
   const { route, callback } = event;
 
   if (!client) {
