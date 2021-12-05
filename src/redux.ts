@@ -83,7 +83,7 @@ export function createGamekitSlice<
     }) => {
       api.updateProfile(currentGame.code, { ...oldSettings, ...settings });
       Object.entries(settings).forEach(([k, v]) => {
-        localStorage.setItem(k, namespaced`${v.toString()}`);
+        localStorage.setItem(namespaced`${k}`, v.toString());
       });
 
       return settings;
@@ -195,22 +195,22 @@ export function createGamekitSlice<
           };
         })
         .addCase(connectToServer.rejected, (state, action) => {
-          console.error(action.error)
+          console.error(action.error);
         })
         .addCase(saveSettings.rejected, (state, action) => {
-          console.error(action.error)
+          console.error(action.error);
         })
         .addCase(createGame.rejected, (state, action) => {
-          console.error(action.error)
+          console.error(action.error);
         })
         .addCase(joinGame.rejected, (state, action) => {
-          console.error(action.error)
+          console.error(action.error);
         })
         .addCase(rejoinGame.rejected, (state, action) => {
-          console.error(action.error)
+          console.error(action.error);
         })
         .addCase(becomeAdmin.rejected, (state, action) => {
-          console.error(action.error)
+          console.error(action.error);
         });
     },
   });
