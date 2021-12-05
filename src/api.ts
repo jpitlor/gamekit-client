@@ -1,5 +1,5 @@
 import * as SockJS from "sockjs-client";
-import { Client } from "@stomp/stompjs";
+import { Client, messageCallbackType } from "@stomp/stompjs";
 import { v4 as uuidv4 } from "uuid";
 import { namespaced, safeDispatch, sleep } from "./utils";
 import { Dispatch, Settings } from "./types";
@@ -132,6 +132,24 @@ export function sendEvent(event: Event) {
   }
 
   client.publish({ destination: `/app${route}`, body: JSON.stringify(data) });
+}
+
+interface Event {
+  route: string;
+  callback: messageCallbackType;
+}
+export function subscribe(event: Event) {
+  const { route, callback } = event;
+
+  if (!client) {
+    throw new Error("There is no active connection to the server");
+  }
+
+  if (!route.startsWith("/")) {
+    throw new Error("The route must contain a leading `/`");
+  }
+
+  client.subscribe(`/app${route}`, callback);
 }
 
 export function updateProfile<S extends Settings>(
